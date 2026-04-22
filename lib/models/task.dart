@@ -1,0 +1,43 @@
+// ไฟล์นี้ใช้สำหรับเก็บข้อมูลของ table ที่เราจะทำงานด้านหลัง
+class Task {
+  // ตัวแปรที่แมพกับชื่อคอลัมน์ใน table
+  String? id;
+  String? task_name;
+  String? task_where;
+  int? task_person;
+  bool? task_status;
+  String? task_duedate;
+  String? task_image_url;
+
+  // constructor
+  Task({
+    this.id,
+    this.task_name,
+    this.task_where,
+    this.task_person,
+    this.task_status,
+    this.task_duedate,
+    this.task_image_url,
+  });
+
+  // แปลงข้อมูลจาก json มาเป็นข้อมูลที่มาใช้ใน app
+  factory Task.fromJson(Map<String, dynamic> json) => Task(
+        id: json['id'],
+        task_name: json['task_name'],
+        task_where: json['task_where'],
+        task_person: json['task_person'],
+        task_status: json['task_status'],
+        task_duedate: json['task_duedate'],
+        task_image_url: json['task_image_url'],
+      );
+
+  // แปลงข้อมูลจาก app มาเป็น json เพื่อส่งไปยัง server
+  Map<String, dynamic> toJson() => {
+        'task_name': task_name,
+        'task_where': task_where,
+        'task_person': task_person,
+        'task_status': task_status,
+        'task_duedate': task_duedate,
+        'task_image_url': task_image_url,
+      };
+}

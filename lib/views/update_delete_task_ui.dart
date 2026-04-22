@@ -8,12 +8,10 @@ class UpdateDeleteTaskUi extends StatefulWidget {
 }
 
 class _UpdateDeleteTaskUiState extends State<UpdateDeleteTaskUi> {
+
+  
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Update/Delete Task UI'),
-      ),
-    );
+    return Scaffold();
   }
 }
