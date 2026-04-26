@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_task_v1_app/models/task.dart';
 import 'package:flutter_task_v1_app/services/supabase_service.dart';
 import 'package:flutter_task_v1_app/views/add_task_ui.dart';
+import 'package:flutter_task_v1_app/views/update_delete_task_ui.dart';
 
 class ShowAllTaskUi extends StatefulWidget {
   const ShowAllTaskUi({super.key});
@@ -11,81 +12,81 @@ class ShowAllTaskUi extends StatefulWidget {
 }
 
 class _ShowAllTaskUiState extends State<ShowAllTaskUi> {
-  // สร้าง Instance ของ SupabaseService
   final service = SupabaseService();
+  List<TaskModel> tasks = [];
+  bool isLoading = true;
 
-  // สร้างตัวแปรสำหรับเก็บข้อมูลจาก supabase
-  List<Task> tasks = [];
-
-  // สร้าง method เพื่อเรียกใช้ service ดึงข้อมูลมาเก็บในตัวแปร
   void loadTasks() async {
-    final data = await service.getTasks();
-    setState(() {
-      tasks = data;
-    });
+    setState(() => isLoading = true);
+    try {
+      final data = await service.getAllTasks();
+      setState(() {
+        tasks = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    // โหลดข้อมูลเมื่อหน้าต่างถูกสร้าง
     loadTasks();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ส่วนของ appBar
       appBar: AppBar(
         backgroundColor: Colors.green,
         title: const Text(
-          'Task Na Ja V.1',
+          'Task Tracker',
           style: TextStyle(
             color: Colors.white,
           ),
         ),
         centerTitle: true,
       ),
-      // ส่วนของปุ่มเพิ่มงาน
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddTaskUi(),
+              builder: (context) => const AddTaskUi(),
             ),
-          );
+          ).then((value) {
+            if (value == true) {
+              loadTasks();
+            }
+          });
         },
         child: const Icon(
           Icons.add,
           color: Colors.white,
         ),
       ),
-      // ส่วนของตำแหน่งปุ่มที่เพิ่มงาน
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      // ส่วนของ body ที่แสดง logo กับข้อมูลมาจาก supabase
-      body: Center(
+      body: isLoading 
+        ? const Center(child: CircularProgressIndicator()) 
+        : Center(
         child: Column(
           children: [
-            // ส่วนของ logo
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             Image.asset(
               'assets/images/logo.png',
               width: 180,
               height: 180,
               fit: BoxFit.cover,
             ),
-            SizedBox(height: 20),
-            // ส่วนของ listview แสดงข้อมูล task_tb จาก supabase
+            const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
-                // จำนวนรายการ
                 itemCount: tasks.length,
-                // หน้าตาของแต่ละรายการ
                 itemBuilder: (context, index) {
                   return Padding(
-                    padding: EdgeInsets.only(
+                    padding: const EdgeInsets.only(
                       top: 10,
                       bottom: 10.0,
                       left: 35,
@@ -93,11 +94,20 @@ class _ShowAllTaskUiState extends State<ShowAllTaskUi> {
                     ),
                     child: ListTile(
                       onTap: () {
-                        // ทำอะไรบางอย่างเมื่อกดรายการ
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UpdateDeleteTaskUi(task: tasks[index]),
+                          ),
+                        ).then((value) {
+                          if (value == true) {
+                            loadTasks();
+                          }
+                        });
                       },
-                      leading: tasks[index].task_image_url! != ''
+                      leading: tasks[index].taskImageUrl != null && tasks[index].taskImageUrl!.isNotEmpty
                           ? Image.network(
-                              tasks[index].task_image_url!,
+                              tasks[index].taskImageUrl!,
                               width: 50,
                               height: 50,
                               fit: BoxFit.cover,
@@ -109,17 +119,17 @@ class _ShowAllTaskUiState extends State<ShowAllTaskUi> {
                               fit: BoxFit.cover,
                             ),
                       title: Text(
-                        'งาน: ${tasks[index].task_name}',
+                        'งาน: ${tasks[index].taskName}',
                       ),
                       subtitle: Text(
-                        'สถานะ: ${tasks[index].task_status == true ? 'เสร็จ' : 'ยังไม่เสร็จ'}',
+                        'สถานะ: ${tasks[index].taskStatus == true ? 'เสร็จแล้ว' : 'ยังไม่เสร็จ'}',
                       ),
-                      trailing: Icon(
+                      trailing: const Icon(
                         Icons.info,
-                        color: Colors.red,
+                        color: Colors.green,
                       ),
-                      tileColor: index % 2 == 0 ? Colors.green[50] : Colors.pink[50],
-                      contentPadding: EdgeInsets.all(10),
+                      tileColor: index % 2 == 0 ? Colors.green[100] : Colors.grey[100],
+                      contentPadding: const EdgeInsets.all(10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),

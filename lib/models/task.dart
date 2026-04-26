@@ -1,43 +1,39 @@
 // ไฟล์นี้ใช้สำหรับเก็บข้อมูลของ table ที่เราจะทำงานด้านหลัง
-class Task {
-  // ตัวแปรที่แมพกับชื่อคอลัมน์ใน table
+class TaskModel {
   String? id;
-  String? task_name;
-  String? task_where;
-  int? task_person;
-  bool? task_status;
-  String? task_duedate;
-  String? task_image_url;
+  String taskName;
+  String taskWhere;
+  int taskPerson;
+  bool taskStatus;
+  String taskDuedate;
+  String? taskImageUrl;
 
-  // constructor
-  Task({
+  TaskModel({
     this.id,
-    this.task_name,
-    this.task_where,
-    this.task_person,
-    this.task_status,
-    this.task_duedate,
-    this.task_image_url,
+    required this.taskName,
+    required this.taskWhere,
+    required this.taskPerson,
+    required this.taskStatus,
+    required this.taskDuedate,
+    this.taskImageUrl,
   });
 
-  // แปลงข้อมูลจาก json มาเป็นข้อมูลที่มาใช้ใน app
-  factory Task.fromJson(Map<String, dynamic> json) => Task(
-        id: json['id'],
-        task_name: json['task_name'],
-        task_where: json['task_where'],
-        task_person: json['task_person'],
-        task_status: json['task_status'],
-        task_duedate: json['task_duedate'],
-        task_image_url: json['task_image_url'],
+  factory TaskModel.fromJson(Map<String, dynamic> json) => TaskModel(
+        id: json['id']?.toString(),
+        taskName: json['task_name'] ?? '',
+        taskWhere: json['task_where'] ?? '',
+        taskPerson: json['task_person'] ?? 0,
+        taskStatus: json['task_status'] ?? false,
+        taskDuedate: json['task_duedate'] ?? '',
+        taskImageUrl: json['task_image_url'],
       );
 
-  // แปลงข้อมูลจาก app มาเป็น json เพื่อส่งไปยัง server
   Map<String, dynamic> toJson() => {
-        'task_name': task_name,
-        'task_where': task_where,
-        'task_person': task_person,
-        'task_status': task_status,
-        'task_duedate': task_duedate,
-        'task_image_url': task_image_url,
+        'task_name': taskName,
+        'task_where': taskWhere,
+        'task_person': taskPerson,
+        'task_status': taskStatus,
+        'task_duedate': taskDuedate,
+        'task_image_url': taskImageUrl,
       };
 }

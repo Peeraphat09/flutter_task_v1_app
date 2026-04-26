@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_task_v1_app/views/show_all_task_ui.dart';
 
 class SplashScreenUi extends StatefulWidget {
@@ -11,19 +11,18 @@ class SplashScreenUi extends StatefulWidget {
 class _SplashScreenUiState extends State<SplashScreenUi> {
   @override
   void initState() {
-    super.initState();
     Future.delayed(
       const Duration(seconds: 3),
       () {
-        if (!mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const ShowAllTaskUi(),
+            builder: (context) => ShowAllTaskUi(),
           ),
         );
       },
     );
+    super.initState();
   }
 
   @override
@@ -32,7 +31,7 @@ class _SplashScreenUiState extends State<SplashScreenUi> {
       backgroundColor: Colors.green,
       body: Stack(
         children: [
-          // ชั้นที่ 1
+          // เธเธฑเนเธเธ—เธตเน 1
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -59,7 +58,7 @@ class _SplashScreenUiState extends State<SplashScreenUi> {
               ],
             ),
           ),
-          // ชั้นที่ 2
+          // เธเธฑเนเธเธ—เธตเน 2
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -69,7 +68,7 @@ class _SplashScreenUiState extends State<SplashScreenUi> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[600],
+                    color: Colors.grey[400],
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -77,7 +76,7 @@ class _SplashScreenUiState extends State<SplashScreenUi> {
                   "Southeast Asia University",
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[600],
+                    color: Colors.grey[400],
                   ),
                 ),
                 const SizedBox(height: 50),

@@ -1,50 +1,58 @@
-// file นี้ใช้สำหรับจัดการการเชื่อมต่อกับ Supabase
-
-// CRUD กับ Table -> database (PostgreSQL) -> supabase
-// upload/delete file bucket -> storage -> supabase
-
-import 'dart:io';
-
-import 'package:flutter_task_v1_app/models/task.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import '../models/task.dart';
 
 class SupabaseService {
-  // สร้าง object/instance ของ Supabase เพื่อใช้งาน
   final supabase = Supabase.instance.client;
 
-  // สร้าง method สำหรับใช้งานกับ supabase
-  // ดึงข้อมูลงานทั้งหมดจาก task_tb และ return ค่าที่ได้จากการดึงไปใช้งาน
-  Future<List<Task>> getTasks() async {
-    // ดึงข้อมูลงานทั้งหมดจาก task_tb
-    final data = await supabase.from('task_tb').select('*');
-
-    // return ค่าที่ได้จากการดึงไปใช้งาน
-    return data.map((task) => Task.fromJson(task)).toList();
+  Future<List<TaskModel>> getAllTasks() async {
+    final List<dynamic> response = await supabase.from('task_tb').select().order('created_at');
+    return response.map((e) => TaskModel.fromJson(e as Map<String, dynamic>)).toList();
   }
 
-  // method อัปโหลดไฟล์ไปยัง task_bk และ return ค่าที่ได้จากการอัปโหลดไปใช้งาน
-  Future<String> uploadFile(File file) async {
-    // สร้างชื่อไฟล์ใหม่ให้ไฟล์เพื่อไม่ให้ซ้ำกัน
-    final fileName =
-        '${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
-
-    // อัปโหลดไฟล์ไปยัง task_bk
-    await supabase.storage.from('task_bk').upload(fileName, file);
-
-    // return ค่าที่ได้จากการอัปโหลดไปใช้งาน
-    return supabase.storage.from('task_bk').getPublicUrl(fileName);
-  }
-
-  // method ลบไฟล์ที่อัปโหลดไปที่ task_tb
-  Future insertTask(Task task) async {
-    // เพิ่มข้อมูลไปยัง task_tb
+  Future<void> addTask(TaskModel task) async {
     await supabase.from('task_tb').insert(task.toJson());
   }
 
-  // method เพิ่มข้อมูลไปยัง task_tb
+  Future<void> updateTask(TaskModel task) async {
+    await supabase.from('task_tb').update(task.toJson()).eq('id', task.id!);
+  }
 
-  // method แก้ไขข้อมูลใน task_tb
+  Future<void> deleteTask(String id) async {
+    await supabase.from('task_tb').delete().eq('id', id);
+  }
 
-  // method ลบข้อมูลใน task_tb
+  // อัปโหลดรูปรองรับ Web
+  Future<String?> uploadImage(XFile imageFile) async {
+    try {
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final path = 'tasks/$fileName';
+      
+      final imageBytes = await imageFile.readAsBytes();
 
+      await supabase.storage.from('task_bk').uploadBinary(
+        path, 
+        imageBytes,
+        fileOptions: const FileOptions(contentType: 'image/jpeg'),
+      );
+      
+      final imageUrl = supabase.storage.from('task_bk').getPublicUrl(path);
+      return imageUrl;
+    } catch (e) {
+      debugPrint('Upload Error: $e');
+      return null;
+    }
+  }
+
+  Future<void> deleteImage(String imageUrl) async {
+    try {
+      final uri = Uri.parse(imageUrl);
+      final pathSegments = uri.pathSegments;
+      final fileName = pathSegments.last; 
+      await supabase.storage.from('task_bk').remove(['tasks/$fileName']);
+    } catch (e) {
+      debugPrint('Delete Image Error: $e');
+    }
+  }
 }

@@ -1,4 +1,5 @@
-import 'dart:io';
+﻿import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -13,9 +14,7 @@ class AddTaskUi extends StatefulWidget {
 }
 
 class _AddTaskUiState extends State<AddTaskUi> {
-  final _supabaseService = SupabaseService();
-  bool _isLoading = false;
-
+  // เธชเธฃเนเธฒเธเธ•เธฑเธงเธเธงเธเธเธธเธก TextField เนเธฅเธฐเธ•เธฑเธงเนเธเธฃเธ—เธตเนเธเธฐเธ•เนเธญเธเน€เธเนเธเธเนเธญเธกเธนเธฅเธ—เธตเนเธเธนเนเนเธเนเธเนเธญเธเธซเธฃเธทเธญเน€เธฅเธทเธญเธ เน€เธเธทเนเธญเธเธฑเธเธ—เธถเธเนเธ task_tb
   TextEditingController taskNameCtrl = TextEditingController();
   TextEditingController taskWhereCtrl = TextEditingController();
   TextEditingController taskPersonCtrl = TextEditingController();
@@ -23,10 +22,14 @@ class _AddTaskUiState extends State<AddTaskUi> {
   TextEditingController taskDuedateCtrl = TextEditingController();
   String taskImageUrl = '';
 
+  //เธ•เธฑเธงเนเธเธฃเน€เธเนเธเนเธเธฅเนเธ—เธตเนเนเธเนเธญเธฑเธเนเธซเธฅเธ”เนเธเธขเธฑเธ task_bk
   File? file;
+
+  //---- เน€เธเธดเธ”เธเธฅเธญเธเธ–เนเธฒเธขเธ เธฒเธ เนเธฅเธฐเธเธณเธซเธเธ”เธเนเธฒเธฃเธนเธเน€เธเธทเนเธญ upload ----
 
   Future<void> pickImage() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.camera);
+
     if (picked != null) {
       setState(() {
         file = File(picked.path);
@@ -34,15 +37,19 @@ class _AddTaskUiState extends State<AddTaskUi> {
     }
   }
 
+  //-------------------------
+  //---- เน€เธเธดเธ”เธเธเธดเธ—เธฑเธเน€เธฅเธทเธญเธเธงเธฑเธเธ—เธตเน เนเธฅเธฐเธเธณเธซเธเธ”เธเนเธฒเธงเธฑเธเธ—เธตเน ----
   DateTime? selectedDate;
 
   Future<void> pickDate() async {
+    // เน€เธเธดเธ”เธเธเธดเธ—เธฑเธ
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
     );
+    // เธเธณเธซเธเธ”เธเนเธฒเธงเธฑเธเธ—เธตเนเนเธซเน taskduedatectrl
     if (picked != null) {
       setState(() {
         selectedDate = picked;
@@ -50,62 +57,33 @@ class _AddTaskUiState extends State<AddTaskUi> {
       });
     }
   }
-
-  Future<void> _saveTask() async {
-    if (taskNameCtrl.text.isEmpty || selectedDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('กรุณากรอกชื่อและวันที่ให้ครบ')),
-      );
-      return;
-    }
-    setState(() => _isLoading = true);
-    try {
-      String? imageUrl;
-      if (file != null) {
-        imageUrl = await _supabaseService.uploadImage(XFile(file!.path));
-      }
-      final newTask = TaskModel(
-        taskName: taskNameCtrl.text,
-        taskWhere: taskWhereCtrl.text,
-        taskPerson: int.tryParse(taskPersonCtrl.text) ?? 0,
-        taskStatus: taskStatus,
-        taskDuedate: taskDuedateCtrl.text,
-        taskImageUrl: imageUrl,
-      );
-      await _supabaseService.addTask(newTask);
-      if (mounted) Navigator.pop(context, true);
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
+  //-------------------------
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: const Text(
-          'Task Na Ja V.1 (เพิ่ม)',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          'Task Na Ja V.1 (เน€เธเธดเนเธก)',
+          style: TextStyle(
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: Colors.white,
           ),
         ),
       ),
-      body: _isLoading 
-        ? const Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(
+          padding: EdgeInsets.only(
             top: 30,
             left: 45,
             right: 45,
@@ -114,6 +92,7 @@ class _AddTaskUiState extends State<AddTaskUi> {
           child: Center(
             child: Column(
               children: [
+                // เธชเนเธงเธเนเธชเธ”เธเธฃเธนเธเนเธฅเธฐเธฃเธนเธเธเธฅเนเธญเธเน€เธเธทเนเธญเน€เธเธดเธ”เธเธฅเนเธญเธ
                 file == null
                     ? InkWell(
                         onTap: () {
@@ -136,10 +115,11 @@ class _AddTaskUiState extends State<AddTaskUi> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                const Align(
+                // เธเนเธญเธเธ—เธณเธญเธฐเนเธฃ
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'ทำอะไร',
+                    'เธ—เธณเธญเธฐเนเธฃ',
                     style: TextStyle(
                       fontSize: 18,
                     ),
@@ -151,14 +131,15 @@ class _AddTaskUiState extends State<AddTaskUi> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
-                    hintText: 'เช่น ซักผ้า, ซ่อมหลอดไฟ',
+                    hintText: 'เน€เธเนเธ เธเธฑเธเธเนเธฒ, เธเนเธญเธกเธซเธฅเธญเธ”เนเธ',
                   ),
                 ),
-                const SizedBox(height: 20),
-                const Align(
+                SizedBox(height: 20),
+                // เธเนเธญเธเธ—เธณเธ—เธตเนเนเธซเธ
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'ทำที่ไหน',
+                    'เธ—เธณเธ—เธตเนเนเธซเธ',
                     style: TextStyle(
                       fontSize: 18,
                     ),
@@ -170,14 +151,15 @@ class _AddTaskUiState extends State<AddTaskUi> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
-                    hintText: 'เช่น บ้าน, ที่ทำงาน',
+                    hintText: 'เน€เธเนเธ เธเนเธฒเธ, เธ—เธตเนเธ—เธณเธเธฒเธ',
                   ),
                 ),
-                const SizedBox(height: 20),
-                const Align(
+                SizedBox(height: 20),
+                // เธเนเธญเธเธ—เธณเธเธฑเธเธเธตเนเธเธ
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'ทำกันกี่คน',
+                    'เธ—เธณเธเธฑเธเธเธตเนเธเธ',
                     style: TextStyle(
                       fontSize: 18,
                     ),
@@ -190,14 +172,15 @@ class _AddTaskUiState extends State<AddTaskUi> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
-                    hintText: 'เช่น 2, 5',
+                    hintText: 'เน€เธเนเธ 2, 5',
                   ),
                 ),
-                const SizedBox(height: 20),
-                const Align(
+                SizedBox(height: 20),
+                // เน€เธฅเธทเธญเธเธ—เธณเน€เธชเธฃเนเธเธซเธฃเธทเธญเธขเธฑเธ
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'ทำเสร็จหรือยัง',
+                    'เธ—เธณเน€เธชเธฃเนเธเธซเธฃเธทเธญเธขเธฑเธ',
                     style: TextStyle(
                       fontSize: 18,
                     ),
@@ -223,8 +206,8 @@ class _AddTaskUiState extends State<AddTaskUi> {
                           50,
                         ),
                       ),
-                      child: const Text(
-                        'เสร็จแล้ว',
+                      child: Text(
+                        'เน€เธชเธฃเนเธเนเธฅเนเธง',
                         style: TextStyle(
                           color: Colors.white,
                         ),
@@ -247,8 +230,8 @@ class _AddTaskUiState extends State<AddTaskUi> {
                           50,
                         ),
                       ),
-                      child: const Text(
-                        'ยังไม่เสร็จ',
+                      child: Text(
+                        'เธขเธฑเธเนเธกเนเน€เธชเธฃเนเธ',
                         style: TextStyle(
                           color: Colors.white,
                         ),
@@ -256,11 +239,12 @@ class _AddTaskUiState extends State<AddTaskUi> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                const Align(
+                SizedBox(height: 20),
+                // เน€เธฅเธทเธญเธเธ•เนเธญเธเน€เธชเธฃเนเธเน€เธกเธทเนเธญเนเธซเธฃเน
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'เสร็จเมื่อไหร่',
+                    'เน€เธชเธฃเนเธเน€เธกเธทเนเธญเนเธซเธฃเน',
                     style: TextStyle(
                       fontSize: 18,
                     ),
@@ -273,16 +257,17 @@ class _AddTaskUiState extends State<AddTaskUi> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
-                    hintText: 'เช่น 2020-01-31',
-                    suffixIcon: const Icon(Icons.calendar_today),
+                    hintText: 'เน€เธเนเธ 2020-01-31',
+                    suffixIcon: Icon(Icons.calendar_today),
                   ),
                   onTap: () {
                     pickDate();
                   },
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
+                // เธเธธเนเธกเธเธฑเธเธ—เธถเธ
                 ElevatedButton(
-                  onPressed: _saveTask,
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     shape: RoundedRectangleBorder(
@@ -293,17 +278,26 @@ class _AddTaskUiState extends State<AddTaskUi> {
                       50,
                     ),
                   ),
-                  child: const Text(
-                    "บันทึก",
+                  child: Text(
+                    "เธเธฑเธเธ—เธถเธ",
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
+                // เธเธธเนเธกเธขเธเน€เธฅเธดเธ
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    setState(() {
+                      taskNameCtrl.clear();
+                      taskWhereCtrl.clear();
+                      taskPersonCtrl.clear();
+                      taskDuedateCtrl.clear();
+                      file = null;
+                      taskStatus = false;
+                      taskImageUrl = '';
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
@@ -315,8 +309,8 @@ class _AddTaskUiState extends State<AddTaskUi> {
                       50,
                     ),
                   ),
-                  child: const Text(
-                    "ยกเลิก",
+                  child: Text(
+                    "เธขเธเน€เธฅเธดเธ",
                     style: TextStyle(
                       color: Colors.white,
                     ),
