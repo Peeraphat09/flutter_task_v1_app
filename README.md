@@ -1,6 +1,6 @@
 # 📝 Task Management App
 
-แอปพลิเคชันจัดการงาน (Mini Project) พัฒนาด้วย Flutter และ Supabase
+แอปพลิเคชันจัดการงาน พัฒนาด้วย Flutter และ Supabase
 
 ## ✨ ฟีเจอร์เด่น
 - **Real-time Synchronization:** ซิงค์ข้อมูลงานแบบเรียลไทม์
@@ -13,9 +13,9 @@
 - **Packages:** `supabase_flutter`, `image_picker`, `google_fonts`
 
 ## 🗄️ Database Schema (SQL)
-ใช้ตาราง `tasks` (หรือตามที่คุณตั้งชื่อไว้) ในการจัดเก็บข้อมูล:
+ใช้ตาราง `task_tb` ในการจัดเก็บข้อมูล:
 ```sql
-create table tasks (
+create table task_tb (
   id uuid primary key default gen_random_uuid(),
   task_name text not null,
   task_where text,
